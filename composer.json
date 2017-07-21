@@ -20,5 +20,8 @@
   },
   "autoload": {
     "psr-4": {"CI_Predis\\": "src/"}
+  },
+  "scripts": {
+    "post-install-cmd": "sh scripts/configure.sh"
   }
 }
