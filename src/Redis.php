@@ -72,16 +72,33 @@ class Redis
         return;
     }
 
+    /**
+     * Call a method from Predis
+     * @param $name
+     * @param $arguments
+     * @return mixed
+     */
     public function __call($name, $arguments)
     {
         return $this->server->getClientInstance()->$name($arguments);
     }
 
+    /**
+     * Call a property on Predis
+     * @param $name
+     * @return mixed
+     */
     public function __get($name)
     {
         return $this->server->getClientInstance()->$name;
     }
 
+    /**
+     * Set a property on Predis
+     * @param $name
+     * @param $value
+     * @return mixed
+     */
     public function __set($name, $value)
     {
         return $this->server->getClientInstance()->$name = $value;
