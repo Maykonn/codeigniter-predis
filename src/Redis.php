@@ -45,7 +45,7 @@ class Redis
         $this->configuration = $this->CI->config->item('redis');
 
         if(empty($this->configuration)) {
-            throw new \Exception('redis.php configuration file not found');
+            throw new \Exception('codeigniter-predis.php configuration file not found');
         }
 
         $this->setServer($params);
