@@ -1,1 +1,1 @@
-cp ../config/codeigniter-predis.php /application/config/codeigniter-predis.php
+cp src/config/codeigniter-predis.php application/config/codeigniter-predis.php
