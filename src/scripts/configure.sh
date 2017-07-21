@@ -1,0 +1,1 @@
+cp ../config/redis.php /application/config/redis.php
