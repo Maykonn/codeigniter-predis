@@ -10,7 +10,7 @@
 
 namespace CI_Predis;
 
-require 'Predis/Autoloader.php';
+//require 'Predis/Autoloader.php';
 use Predis\Autoloader;
 
 Autoloader::register();
