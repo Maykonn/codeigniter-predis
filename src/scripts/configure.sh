@@ -1,1 +1,1 @@
-cp ../config/redis.php /application/config/redis.php
+cp ../config/codeigniter-predis.php /application/config/codeigniter-predis.php
