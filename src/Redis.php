@@ -8,41 +8,67 @@
  * file that was distributed with this source code.
  */
 
-namespace Predis;
+namespace CI_Predis;
+
+require 'Predis/Autoloader.php';
+use Predis\Autoloader;
+
+Autoloader::register();
 
 class Redis
 {
     /**
      * @var array
-     * @see config/redis.php
+     * @see /application/config/codeigniter-predis.php in your codeigniter project
      */
     private $configuration = [];
+
+    /**
+     * @var RedisServer
+     */
+    private $server;
 
     private $CI;
 
     /**
      * Redis constructor.
-     * @throws Exception
+     * @throws \Exception
      */
-    public function __construct()
+    public function __construct(Array $params = null)
     {
         $this->CI =& get_instance();
 
         // loads $config in config/redis.php file
-        $this->CI->load->config('redis');
+        $this->CI->load->config('codeigniter-predis');
 
         // loads the $config['redis']['default'] configs
         $this->configuration = $this->CI->config->item('redis');
 
         if(empty($this->configuration)) {
-            throw new Exception('redis.php configuration file not found');
+            throw new \Exception('redis.php configuration file not found');
         }
 
-        return new Predis\Client([
-            'scheme' => 'tcp',
-            'host'   => 'localhost',
-            'port'   => 6379,
-            'database' => 1, // default is 0, you can put 0-15
-        ]);
+        $this->setServer($params);
+        return $this->server;
+    }
+
+    /**
+     * @param array $params
+     * @return RedisServer
+     * @throws \Exception
+     */
+    public function setServer(Array $params)
+    {
+        $server = 'default';
+        if(!empty($params['server'])) {
+            $server = $params['server'];
+        }
+
+        if(empty($this->configuration[$server])) {
+            throw new \Exception('Configuration for requested Redis Server not found.');
+        }
+
+        $this->server = new RedisServer($this->configuration[$server]);
+        return;
     }
 }
