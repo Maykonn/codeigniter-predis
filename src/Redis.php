@@ -10,12 +10,11 @@
 
 namespace CI_Predis;
 
-//require 'Predis/Autoloader.php';
 use Predis\Autoloader;
 
 Autoloader::register();
 
-class Redis
+class Redis extends AbstractLibrary
 {
     /**
      * @var array
@@ -28,15 +27,10 @@ class Redis
      */
     private $server;
 
-    private $CI;
-
-    /**
-     * Redis constructor.
-     * @throws \Exception
-     */
-    public function __construct(Array $params = null)
+    protected function configure(Array $params = null)
     {
-        $this->CI =& get_instance();
+        // loads predis as a library
+        $this->CI->load->library('vendor/predis');
 
         // loads $config in config/redis.php file
         $this->CI->load->config('codeigniter-predis');
@@ -49,7 +43,7 @@ class Redis
         }
 
         $this->setServer($params);
-        return $this->server;
+        return;
     }
 
     /**
