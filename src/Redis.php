@@ -71,4 +71,19 @@ class Redis
         $this->server = new RedisServer($this->configuration[$server]);
         return;
     }
+
+    public function __call($name, $arguments)
+    {
+        return $this->server->getClientInstance()->$name($arguments);
+    }
+
+    public function __get($name)
+    {
+        return $this->server->getClientInstance()->$name;
+    }
+
+    public function __set($name, $value)
+    {
+        return $this->server->getClientInstance()->$name = $value;
+    }
 }
