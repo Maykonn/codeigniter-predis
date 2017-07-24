@@ -1,6 +1,8 @@
 # Redis for CodeIgniter
 
 ## Installation
+If you are using composer, type: `composer require maykonn/codeigniter-predis` or if not:
+
 1) Download the code as ZIP in `Clone or download` button
 2) Extract the downloaded zip into your `application/libraries/` directory
 3) Rename the extracted directory to `application/libraries/codeigniter-predis`
