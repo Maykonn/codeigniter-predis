@@ -5,7 +5,7 @@
 2) Extract the downloaded zip into your `application/libraries/` directory
 3) Rename the extracted directory to `application/libraries/codeigniter-predis`
 4) In your terminal go to library directory and type: `composer install`
-5) The installation will create a `codeigniter-predis.php` file into the `application/config/` directory
+5) The installation will create a `codeigniter-predis.php` file into the `application/config/` folder
 
 ## Using
 Writing...  
