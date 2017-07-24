@@ -8,14 +8,18 @@ switch (ENVIRONMENT) {
     case 'testing':
         $config['redis'] = [
             'default' => [
+                'scheme' => 'tcp',
                 'host' => 'localhost',
                 'port' => 6379,
-                'password' => '',
+                'password' => null,
+                'database' => 0,
             ],
             'another_instance_example' => [
+                'scheme' => 'tcp',
                 'host' => '127.0.0.1',
                 'port' => 6379,
-                'password' => '',
+                'password' => null,
+                'database' => 1,
             ],
         ];
         break;
