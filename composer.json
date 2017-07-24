@@ -22,6 +22,7 @@
     "psr-4": {"CI_Predis\\": "src/"}
   },
   "scripts": {
-    "post-install-cmd": "chmod 700 src/scripts/configure.sh & sh ./src/scripts/configure.sh"
+    "post-install-cmd": "chmod 700 src/scripts/configure.sh & sh ./src/scripts/configure.sh",
+    "post-update-cmd": "chmod 700 src/scripts/configure.sh & sh ./src/scripts/configure.sh"
   }
 }
