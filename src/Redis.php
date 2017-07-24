@@ -7,15 +7,17 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace CI_Predis;
 
 use Predis\Autoloader;
+use Predis\Client;
 
-Autoloader::register();
+require_once APPPATH . 'libraries/codeigniter-predis/vendor/autoload.php';
 
-class Redis extends AbstractLibrary
+class Redis
 {
+    private $CI;
+
     /**
      * @var array
      * @see /application/config/codeigniter-predis.php in your codeigniter project
@@ -23,78 +25,107 @@ class Redis extends AbstractLibrary
     private $configuration = [];
 
     /**
-     * @var RedisServer
+     * @var \CI_Predis\RedisServer
      */
-    private $server;
+    private $serverConnected;
 
-    protected function configure(Array $params = null)
+    /**
+     * @var RedisServerCollection
+     */
+    private $serversList;
+
+    /**
+     * @return Client
+     */
+    public function getServerConnected()
     {
-        // loads predis as a library
-        $this->CI->load->library('vendor/predis');
+        return $this->serverConnected->getClientInstance();
+    }
+
+    /**
+     * @return RedisServerCollection
+     */
+    public function getServersCollection()
+    {
+        return $this->serversList;
+    }
+
+    /**
+     * Redis constructor.
+     * @param array|null $params
+     * @throws Exception
+     */
+    public function __construct(Array $params = null)
+    {
+        $this->CI =& get_instance();
 
         // loads $config in config/redis.php file
         $this->CI->load->config('codeigniter-predis');
 
-        // loads the $config['redis']['default'] configs
+        // get the $config['redis'] configuration value
         $this->configuration = $this->CI->config->item('redis');
 
         if(empty($this->configuration)) {
-            throw new \Exception('codeigniter-predis.php configuration file not found');
+            throw new Exception('The application/config/redis.php configuration file not found');
         }
 
-        $this->setServer($params);
+        Autoloader::register();
+
+        $this->serversList = new RedisServerCollection();
+        if(!empty($params['serverName'])) {
+            $this->connect($params['serverName']);
+        }
+
         return;
     }
 
     /**
-     * @param array $params
-     * @return RedisServer
+     * @param string $serverName Configuration in application/config/codeigniter-predis.php
      * @throws \Exception
      */
-    public function setServer(Array $params)
+    public function connect($serverName)
     {
-        $server = 'default';
-        if(!empty($params['server'])) {
-            $server = $params['server'];
+        if(empty($this->configuration[$serverName])) {
+            throw new \Exception('Configuration for requested Redis Server not found, given: ' . $serverName);
         }
 
-        if(empty($this->configuration[$server])) {
-            throw new \Exception('Configuration for requested Redis Server not found.');
-        }
-
-        $this->server = new RedisServer($this->configuration[$server]);
+        $this->serverConnected = new RedisServer($this->configuration[$serverName]);
+        $this->serversList->append($serverName, $this->serverConnected);
         return;
     }
 
     /**
-     * Call a method from Predis
+     * Call a method in Predis\Client instance
      * @param $name
      * @param $arguments
      * @return mixed
      */
     public function __call($name, $arguments)
     {
-        return $this->server->getClientInstance()->$name($arguments);
+        return call_user_func_array(
+            [$this->serverConnected->getClientInstance(), $name],
+            $arguments
+        );
     }
 
     /**
-     * Call a property on Predis
+     * Call a property in Predis\Client instance
      * @param $name
      * @return mixed
      */
     public function __get($name)
     {
-        return $this->server->getClientInstance()->$name;
+        return $this->serverConnected->getClientInstance()->$name;
     }
 
     /**
-     * Set a property on Predis
+     * Set a property in Predis\Client instance
      * @param $name
      * @param $value
      * @return mixed
      */
     public function __set($name, $value)
     {
-        return $this->server->getClientInstance()->$name = $value;
+        return $this->serverConnected->getClientInstance()->$name = $value;
     }
 }
