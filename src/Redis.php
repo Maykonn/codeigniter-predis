@@ -211,20 +211,20 @@ class Redis
     /**
      * Redis constructor.
      * @param array|null $params
-     * @throws Exception
+     * @throws \Exception
      */
     public function __construct(Array $params = null)
     {
         $this->CI =& get_instance();
 
-        // loads $config in config/redis.php file
+        // loads $config in config/codeigniter-predis.php file
         $this->CI->load->config('codeigniter-predis');
 
         // get the $config['redis'] configuration value
         $this->configuration = $this->CI->config->item('redis');
 
         if(empty($this->configuration)) {
-            throw new Exception('The application/config/redis.php configuration file not found');
+            throw new \Exception('The application/config/codeigniter-predis.php configuration file not found');
         }
 
         Autoloader::register();
