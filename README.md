@@ -32,3 +32,21 @@ echo $this->redis->ping();
 ```
 
 5) [**See the example here**](https://github.com/Maykonn/codeigniter-predis/blob/master/example/application/controllers/Welcome.php)
+
+## How to perform redis commands?
+You can perform redis commands in three different ways:
+
+Will call the command on the current setted server, to change server use $redis->connect() method:
+```
+$redis->some_redis_command();
+```
+
+Alias to the code above:
+``` 
+$redis->getServerConnected()->some_redis_command();
+```
+
+Call the command in a specific server that isn't the current connect server (but instantiated before using connect method)
+```
+$redis->getServersCollection()->getServer('some_server')->some_redis_command();
+```
