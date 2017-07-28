@@ -71,10 +71,12 @@ class Redis
 
         Autoloader::register();
 
-        $this->serversList = new RedisServerCollection();
-        if(!empty($params['serverName'])) {
-            $this->connect($params['serverName']);
+        if(empty($params['serverName'])) {
+            $params['serverName'] = $this->configuration['default_server'];
         }
+
+        $this->serversList = new RedisServerCollection();
+        $this->connect($params['serverName']);
 
         return;
     }
@@ -85,11 +87,11 @@ class Redis
      */
     public function connect($serverName)
     {
-        if(empty($this->configuration[$serverName])) {
+        if(empty($this->configuration['servers'][$serverName])) {
             throw new \Exception('Configuration for requested Redis Server not found, given: ' . $serverName);
         }
 
-        $this->serverConnected = new RedisServer($this->configuration[$serverName]);
+        $this->serverConnected = new RedisServer($this->configuration['servers'][$serverName]);
         $this->serversList->append($serverName, $this->serverConnected);
         return;
     }
