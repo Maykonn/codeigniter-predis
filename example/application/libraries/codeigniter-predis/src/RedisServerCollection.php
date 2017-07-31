@@ -20,22 +20,13 @@ class RedisServerCollection
      */
     private $list;
 
-    public function __construct()
-    {
-        $this->list = new \ArrayObject();
-    }
-
     /**
-     * @param $serverName
-     * @return Client
-     * @throws \Exception
+     * RedisServerCollection constructor.
+     * @param array|null $serversList a RedisServer array
      */
-    public function getServer($serverName)
+    public function __construct(Array $serversList = null)
     {
-        if($this->list->offsetExists($serverName)) {
-            return $this->list->offsetGet($serverName)->getClientInstance();
-        }
-        throw new \Exception('Redis server not found, given: ' . $serverName);
+        $this->list = new \ArrayObject($serversList);
     }
 
     /**
@@ -48,12 +39,14 @@ class RedisServerCollection
 
     /**
      * @param $serverName
-     * @param RedisServer $redisServer
-     * @return void
+     * @return RedisServer
+     * @throws \Exception
      */
-    public function append($serverName, RedisServer $redisServer)
+    public function getServer($serverName)
     {
-        $this->list->offsetSet($serverName, $redisServer);
-        return;
+        if($this->list->offsetExists($serverName)) {
+            return $this->list->offsetGet($serverName);
+        }
+        throw new \Exception('Redis server not found, given: ' . $serverName);
     }
 }

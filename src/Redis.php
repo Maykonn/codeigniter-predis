@@ -224,7 +224,7 @@ class Redis
         $this->configuration = $this->CI->config->item('redis');
 
         if(empty($this->configuration)) {
-            throw new Exception('The application/config/redis.php configuration file not found');
+            throw new \Exception('The application/config/redis.php configuration file not found');
         }
 
         Autoloader::register();

@@ -13,18 +13,107 @@ use Predis\Client;
 
 class RedisServer
 {
+    const STATUS_CONNECTED = 'CONNECTED';
+    const STATUS_DISCONNECTED = 'DISCONNECTED';
+
+    private $name;
+
+    private $status = self::STATUS_DISCONNECTED;
+
+    /**
+     * @var RedisServerConfiguration
+     */
+    private $configuration;
+
     /**
      * @var Client
      */
     private $clientInstance;
 
-    public function __construct(Array $config)
+    /**
+     * @return RedisServerConfiguration
+     */
+    public function getConfiguration()
     {
-        $this->clientInstance = new Client($config);
-        return;
+        return $this->configuration;
     }
+
+    /**
+     * @return string
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function __construct($serverName, Array $config)
+    {
+        $this->name = $serverName;
+        $this->configuration = new RedisServerConfiguration($config);
+    }
+
     public function getClientInstance()
     {
         return $this->clientInstance;
+    }
+
+    public function connect()
+    {
+        if(empty($this->configuration)) {
+            throw new \Exception('Configuration for requested Redis Server not found, given: ' . $this->name);
+        }
+
+        if($this->status == self::STATUS_DISCONNECTED) {
+            $this->clientInstance = new Client($this->configuration->toArray());
+            $this->status = self::STATUS_CONNECTED;
+        }
+
+        return;
+    }
+
+    /**
+     * Call a method in Predis\Client instance
+     * @param $name
+     * @param $arguments
+     * @return mixed
+     */
+    public function __call($name, $arguments)
+    {
+        $this->connect();
+        return call_user_func_array(
+            [$this->getClientInstance(), $name],
+            $arguments
+        );
+    }
+
+    /**
+     * Call a property in Predis\Client instance
+     * @param $name
+     * @return mixed
+     */
+    public function __get($name)
+    {
+        $this->connect();
+        return $this->getClientInstance()->$name;
+    }
+
+    /**
+     * Set a property in Predis\Client instance
+     * @param $name
+     * @param $value
+     * @return mixed
+     */
+    public function __set($name, $value)
+    {
+        $this->connect();
+        return $this->getClientInstance()->$name = $value;
     }
 }

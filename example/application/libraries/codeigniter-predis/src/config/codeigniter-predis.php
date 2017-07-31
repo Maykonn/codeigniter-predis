@@ -7,19 +7,29 @@ switch (ENVIRONMENT) {
     case 'development':
     case 'testing':
         $config['redis'] = [
-            'default' => [
-                'scheme' => 'tcp',
-                'host' => 'localhost',
-                'port' => 6379,
-                'password' => null,
-                'database' => 0,
-            ],
-            'another_instance_example' => [
-                'scheme' => 'tcp',
-                'host' => '127.0.0.1',
-                'port' => 6379,
-                'password' => null,
-                'database' => 1,
+            'default_server' => 'localhost',
+            'servers' => [
+                'localhost' => [
+                    'scheme' => 'tcp',
+                    'host' => 'localhost',
+                    'port' => 6379,
+                    'password' => null,
+                    'database' => 0,
+                ],
+                'another_instance_example' => [
+                    'scheme' => 'tcp',
+                    'host' => '127.0.0.1',
+                    'port' => 6379,
+                    'password' => null,
+                    'database' => 1,
+                ],
+                'not_accessible_server' => [
+                    'scheme' => 'tcp',
+                    'host' => '10.0.0.2',
+                    'port' => 6379,
+                    'password' => null,
+                    'database' => 1,
+                ],
             ],
         ];
         break;

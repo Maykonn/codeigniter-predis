@@ -10,7 +10,6 @@
 namespace CI_Predis;
 
 use Predis\Autoloader;
-use Predis\Client;
 
 require_once APPPATH . 'libraries/codeigniter-predis/vendor/autoload.php';
 
@@ -190,14 +189,14 @@ class Redis
     /**
      * @var RedisServerCollection
      */
-    private $serversList;
+    private $servers;
 
     /**
-     * @return Client
+     * @return RedisServer
      */
     public function getServerConnected()
     {
-        return $this->serverConnected->getClientInstance();
+        return $this->serverConnected;
     }
 
     /**
@@ -205,52 +204,19 @@ class Redis
      */
     public function getServersCollection()
     {
-        return $this->serversList;
+        return $this->servers;
     }
 
     /**
      * Redis constructor.
      * @param array|null $params
-     * @throws Exception
+     * @throws \Exception
      */
     public function __construct(Array $params = null)
     {
         $this->CI =& get_instance();
-
-        // loads $config in config/redis.php file
-        $this->CI->load->config('codeigniter-predis');
-
-        // get the $config['redis'] configuration value
-        $this->configuration = $this->CI->config->item('redis');
-
-        if(empty($this->configuration)) {
-            throw new Exception('The application/config/redis.php configuration file not found');
-        }
-
+        $this->configure();
         Autoloader::register();
-
-        if(empty($params['serverName'])) {
-            $params['serverName'] = $this->configuration['default_server'];
-        }
-
-        $this->serversList = new RedisServerCollection();
-        $this->connect($params['serverName']);
-
-        return;
-    }
-
-    /**
-     * @param string $serverName Configuration in application/config/codeigniter-predis.php
-     * @throws \Exception
-     */
-    public function connect($serverName)
-    {
-        if(empty($this->configuration['servers'][$serverName])) {
-            throw new \Exception('Configuration for requested Redis Server not found, given: ' . $serverName);
-        }
-
-        $this->serverConnected = new RedisServer($this->configuration['servers'][$serverName]);
-        $this->serversList->append($serverName, $this->serverConnected);
         return;
     }
 
@@ -263,7 +229,7 @@ class Redis
     public function __call($name, $arguments)
     {
         return call_user_func_array(
-            [$this->serverConnected->getClientInstance(), $name],
+            [$this->serverConnected, $name],
             $arguments
         );
     }
@@ -275,7 +241,7 @@ class Redis
      */
     public function __get($name)
     {
-        return $this->serverConnected->getClientInstance()->$name;
+        return $this->serverConnected->$name;
     }
 
     /**
@@ -286,6 +252,34 @@ class Redis
      */
     public function __set($name, $value)
     {
-        return $this->serverConnected->getClientInstance()->$name = $value;
+        return $this->serverConnected->$name = $value;
+    }
+
+    private function configure()
+    {
+        // loads $config in config/redis.php file
+        $this->CI->load->config('codeigniter-predis');
+
+        // get the $config['redis'] configuration value
+        $this->configuration = $this->CI->config->item('redis');
+
+        if(empty($this->configuration)) {
+            throw new \Exception('The application/config/redis.php configuration file not found');
+        }
+
+        $serversInstances = [];
+        foreach ($this->configuration['servers'] as $serverName => $serverConfigurationParams) {
+            $serversInstances[$serverName] = new RedisServer($serverName, $serverConfigurationParams);
+        }
+
+        $this->servers = new RedisServerCollection($serversInstances);
+
+        if(!$this->serverConnected instanceof RedisServer) {
+            $serverDefault = $this->servers->getServer($this->configuration['default_server']);
+            $serverDefault->connect();
+            $this->serverConnected = $serverDefault;
+        }
+
+        return;
     }
 }

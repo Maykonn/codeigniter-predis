@@ -27,16 +27,20 @@ class Welcome extends CI_Controller {
 		echo $this->redis->getServerConnected()->ping() . '<br><br>';
 
 
-		// Connect to another server
-		$this->redis->connect('another_instance_example');
-		echo 'PING server another_instance_example: ';
-		echo $this->redis->ping() . '<br><br>';
-		echo 'PING server another_instance_example again: ';
+		// Connect to another server(not instantiated before and is not the default server too)
+		//$this->redis->connect('another_instance_example');
+		//echo 'PING server another_instance_example: ';
+		//echo $this->redis->ping() . '<br><br>';
+		echo 'PING server another_instance_example again(auto connect): ';
 		echo $this->redis->getServersCollection()->getServer('another_instance_example')->ping() . '<br><br>';
 
 
 		// Calling a command in a not connected server
-        //echo 'PING a not connected server: <br>';
-        // $this->redis->getServersCollection()->getServer('not_connected_server')->ping() . '<br>';
+        echo 'PING a not accessible server: ';
+        try {
+            $this->redis->getServersCollection()->getServer('not_accessible_server')->ping() . '<br>';
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
 	}
 }

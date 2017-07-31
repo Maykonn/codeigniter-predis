@@ -23,9 +23,9 @@ switch (ENVIRONMENT) {
                     'password' => null,
                     'database' => 1,
                 ],
-                'not_connected_server' => [
+                'not_accessible_server' => [
                     'scheme' => 'tcp',
-                    'host' => '127.0.0.1',
+                    'host' => '10.0.0.2',
                     'port' => 6379,
                     'password' => null,
                     'database' => 1,
